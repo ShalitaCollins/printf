@@ -1,56 +1,58 @@
 #include <stdio.h>
 #include <stdarg.h>
-#include "main.h" 
+#include <stdbool.h>
+
+#define BUFF_SIZE 1024
+
+int _putchar(char c);
+
+void print_buffer(char buffer[], int *buff_ind);
+
 int _printf(const char *format, ...) {
-    va_list args;
-    va_start(args, format);
+    int i, printed = 0, printed_chars = 0;
+    int flags, width, precision, size, buff_ind = 0;
+    va_list list;
+    char buffer[BUFF_SIZE];
 
-    int char_count = 0;
+    if (format == NULL)
+        return (-1);
 
-    while (*format) {
-        if (*format != '%') {
-            putchar(*format);
-            char_count++;
+    va_start(list, format);
+
+    for (i = 0; format && format[i] != '\0'; i++) {
+        if (format[i] != '%') {
+            buffer[buff_ind++] = format[i];
+            if (buff_ind == BUFF_SIZE)
+                print_buffer(buffer, &buff_ind);
+            printed_chars++;
         } else {
-            format++;
-            if (*format == '\0') break;
-
-            if (*format == 'c') {
-                char c = va_arg(args, int);
-                putchar(c);
-                char_count++;
-            } else if (*format == 's') {
-                char *str = va_arg(args, char *);
-                if (str != NULL) {
-                    while (*str) {
-                        putchar(*str);
-                        str++;
-                        char_count++;
-                    }
-                }
-            } else if (*format == '%') {
-                putchar('%');
-                char_count++;
-            } else {
-                // Handle unsupported format specifiers
-                putchar('%');
-                putchar(*format);
-                char_count += 2;
-            }
+            print_buffer(buffer, &buff_ind);
+            flags = get_flags(format, &i);
+            width = get_width(format, &i, list);
+            precision = get_precision(format, &i, list);
+            size = get_size(format, &i);
+            ++i;
+            printed = handle_print(format, &i, list, buffer, flags, width, precision, size);
+            if (printed == -1)
+                return (-1);
+            printed_chars += printed;
         }
-        format++;
     }
 
-    va_end(args);
-    return char_count;
+    print_buffer(buffer, &buff_ind);
+
+    va_end(list);
+
+    return (printed_chars);
 }
 
-int main() {
-    int num = 42;
-    char *str = "Hello, world!";
+void print_buffer(char buffer[], int *buff_ind) {
+    if (*buff_ind > 0)
+        write(1, &buffer[0], *buff_ind);
 
-    int printed = _printf("This is a number: %d, a character: %c, a string: %s, and a percent sign: %%\n", num, 'A', str);
-    printf("Characters printed: %d\n", printed);
+    *buff_ind = 0;
+}
 
-    return 0;
+int _putchar(char c) {
+    // Your _putchar implementation here
 }
