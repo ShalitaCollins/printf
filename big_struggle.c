@@ -1,45 +1,32 @@
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
 #include "main.h"
-int _printf(const char *format, ...) {
-    va_list args;
-    va_start(args, format);
 
-    
-    const char *ptr = format;
-    while (*ptr != '\0') {
-        if (*ptr == '%') {
-            ptr++;
-            switch (*ptr++) {
-                case 'c': {
-            
-                    char ch = (char)va_arg(args, int);
-                    putchar(ch);
-                    break;
-                }
-                case 's': {
-            
-                    const char *str = va_arg(args, const char *);
-                    puts(str);
-                    break;
-                }
-                case '%': {
-            
-                    putchar('%');
-                    break;
-                }
-                default: {
-            
-                    break;
-                }
-            }
-        } else {
-            
-            putchar(*ptr++);
-        }
-    }
+/**
+* _print - function that gives output depending to a format
+* @format: format depending to the printed argument 
+* Return: return numbers of printed  char
+*/
 
-    va_end(args);
-    return 0;
-}
+int _printf(const char *format, ...)
+{
+
+         int count = 0;
+        va_list args;
+
+       if (format == NULL)
+                    return (-1);
+
+        va_start(args, format);
+
+       while (*format)
+      {
+               if (*format != '%')
+              {     
+               
+                           write(1, format, 1);
+               }
+
+               format++; 
+      }
+
+      return (count);
+}            
